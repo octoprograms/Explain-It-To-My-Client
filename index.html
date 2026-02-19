@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Translate technical jargon into plain language your clients will actually understand." />
+  <title>Explain It To My Client</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+  <!-- ====== Settings Modal ====== -->
+  <div class="modal-overlay" id="apiModal">
+    <div class="modal">
+      <div class="modal-icon">🔑</div>
+      <h2>AI Provider Setup</h2>
+
+      <!-- Provider Toggle -->
+      <div class="provider-toggle" id="providerToggle">
+        <button class="provider-btn active" data-provider="gemini">
+          <span class="provider-dot"></span>Gemini
+        </button>
+        <button class="provider-btn" data-provider="openrouter">
+          <span class="provider-dot"></span>OpenRouter
+        </button>
+      </div>
+
+      <!-- Gemini Config -->
+      <div class="provider-config" id="geminiConfig">
+        <p>Free from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com</a>. Stored locally.</p>
+        <input type="password" id="geminiKeyInput" placeholder="AIza..." autocomplete="off" />
+      </div>
+
+      <!-- OpenRouter Config -->
+      <div class="provider-config" id="openrouterConfig" style="display:none">
+        <p>Get your key from <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>. Access 200+ models.</p>
+        <input type="password" id="openrouterKeyInput" placeholder="sk-or-v1-..." autocomplete="off" />
+        <label class="select-label" for="modelSelect">Model</label>
+        <select id="modelSelect">
+          <optgroup label="Free">
+            <option value="google/gemini-2.0-flash-exp:free">Gemini 2.0 Flash (free)</option>
+            <option value="deepseek/deepseek-chat-v3-0324:free">DeepSeek V3 (free)</option>
+            <option value="meta-llama/llama-4-maverick:free">Llama 4 Maverick (free)</option>
+            <option value="qwen/qwen3-235b-a22b:free">Qwen3 235B (free)</option>
+          </optgroup>
+          <optgroup label="Paid – Budget">
+            <option value="google/gemini-2.0-flash-001">Gemini 2.0 Flash</option>
+            <option value="anthropic/claude-3.5-haiku">Claude 3.5 Haiku</option>
+            <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+          </optgroup>
+          <optgroup label="Paid – Premium">
+            <option value="openai/gpt-4o">GPT-4o</option>
+            <option value="anthropic/claude-sonnet-4">Claude Sonnet 4</option>
+            <option value="google/gemini-2.5-pro-preview">Gemini 2.5 Pro</option>
+          </optgroup>
+          <optgroup label="───────────">
+            <option value="__custom__">✏️ Custom model…</option>
+          </optgroup>
+        </select>
+        <input type="text" id="customModelInput" class="custom-model-input" placeholder="e.g. anthropic/claude-3.5-sonnet" autocomplete="off" style="display:none" />
+      </div>
+
+      <button class="btn btn-primary" id="saveKeyBtn">Save &amp; Start</button>
+      <p class="modal-hint">You can change this anytime via the ⚙️ icon.</p>
+    </div>
+  </div>
+
+  <!-- ====== Toast ====== -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ====== Main Container ====== -->
+  <div class="app">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">
+          <svg viewBox="0 0 32 32" width="36" height="36">
+            <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#F97316"/></linearGradient></defs>
+            <rect width="32" height="32" rx="8" fill="#1E293B"/>
+            <path d="M6 10c0-2.2 1.8-4 4-4h12c2.2 0 4 1.8 4 4v8c0 2.2-1.8 4-4 4h-3l-4 4-1-4H10c-2.2 0-4-1.8-4-4V10z" fill="url(#lg)"/>
+            <circle cx="11" cy="14" r="1.5" fill="#1E293B"/><circle cx="16" cy="14" r="1.5" fill="#1E293B"/><circle cx="21" cy="14" r="1.5" fill="#1E293B"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="header-title">Explain It To My Client</h1>
+          <p class="header-sub">Turn dev-speak into human-speak</p>
+        </div>
+      </div>
+      <button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </header>
+
+    <!-- Input Section -->
+    <section class="card input-card">
+      <label class="card-label" for="techInput">
+        <span class="label-icon">⌨️</span>
+        Paste your technical task
+      </label>
+      <textarea
+        id="techInput"
+        rows="4"
+        placeholder="e.g. Migrating Supabase storage buckets and restructuring relational schema with foreign key constraints..."
+        maxlength="2000"
+      ></textarea>
+      <div class="input-footer">
+        <span class="char-count" id="charCount">0 / 2000</span>
+      </div>
+    </section>
+
+    <!-- Tone Selector -->
+    <section class="tone-section">
+      <p class="tone-label">Choose a tone</p>
+      <div class="tone-pills" id="tonePills">
+        <button class="tone-pill active" data-tone="simple">
+          <span class="pill-emoji">🧒</span>
+          <span>Simple</span>
+        </button>
+        <button class="tone-pill" data-tone="executive">
+          <span class="pill-emoji">💼</span>
+          <span>Executive</span>
+        </button>
+        <button class="tone-pill" data-tone="friendly">
+          <span class="pill-emoji">😊</span>
+          <span>Friendly</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Translate Button -->
+    <button class="btn btn-primary btn-translate" id="translateBtn">
+      <span class="btn-label">Translate</span>
+      <svg class="btn-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      <div class="spinner" style="display:none"></div>
+    </button>
+
+    <!-- Output Section -->
+    <section class="card output-card" id="outputCard" style="display:none">
+      <div class="output-header">
+        <span class="card-label">
+          <span class="label-icon">💬</span>
+          Client-ready version
+        </span>
+        <div class="output-actions">
+          <button class="icon-btn small" id="copyBtn" title="Copy to clipboard">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+          <button class="icon-btn small" id="shareBtn" title="Copy shareable link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="output-text" id="outputText"></div>
+    </section>
+
+    <!-- Skeleton (loading state) -->
+    <section class="card output-card skeleton-card" id="skeletonCard" style="display:none">
+      <div class="output-header">
+        <span class="card-label"><span class="label-icon">💬</span> Translating...</span>
+      </div>
+      <div class="skeleton-lines">
+        <div class="skeleton-line" style="width:92%"></div>
+        <div class="skeleton-line" style="width:78%"></div>
+        <div class="skeleton-line" style="width:85%"></div>
+        <div class="skeleton-line" style="width:60%"></div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Powered by AI &bull; Your keys stay in your browser</p>
+    </footer>
+  </div>
+
+  <script type="module" src="/main.js"></script>
+</body>
+</html>
