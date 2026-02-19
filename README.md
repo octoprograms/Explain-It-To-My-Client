@@ -50,7 +50,7 @@ Every developer has been there — you finish a complex task and need to explain
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/explain-it-to-my-client.git
+git clone https://github.com/octoprograms/Explain-It-To-My-Client.git
 cd explain-it-to-my-client
 
 # Install dependencies
